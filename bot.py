@@ -1,5 +1,6 @@
 import logging
 from aiogram import Bot, Dispatcher, types
+from config import token
 
 first_photo = False
 second_photo = False
@@ -8,7 +9,7 @@ second_photo = False
 logging.basicConfig(level=logging.INFO)
 
 # Initialize bot and dispatcher
-bot = Bot(token='6237469218:AAEJ8-31b43Dy2XS5la-yRu9Rf1jZJdXlBY')
+bot = Bot(token=token)
 dp = Dispatcher(bot)
 
 

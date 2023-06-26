@@ -9,6 +9,7 @@ second_photo = False
 epochs = 100
 alpha = 10
 betta = 1000
+IMG_SIZE = 128
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -21,12 +22,22 @@ dp = Dispatcher(bot)
 @dp.message_handler(commands=['epochs'])
 async def set_epochs(message: types.Message):
     try:
-        epochs = int(message.text.split()[1])
-        if epochs < 50 or epochs > 300:
+        if int(message.text.split()[1]) < 50 or int(message.text.split()[1]) > 300:
             raise ValueError
+        epochs = int(message.text.split()[1])
         await message.answer(f'Количетво эпох: {epochs}')
     except (ValueError, IndexError):
         await message.answer(f'Пожалуйста, введите целое число от 50 до 300!')
+
+@dp.message_handler(commands=['imgsize'])
+async def set_imgsize(message: types.Message):
+    try:
+        if int(message.text.split()[1]) < 64 or int(message.text.split()[1]) > 256:
+            raise ValueError
+        IMG_SIZE = int(message.text.split()[1])
+        await message.answer(f'Качество картинки: {IMG_SIZE}x{IMG_SIZE} пикселей')
+    except (ValueError, IndexError):
+        await message.answer(f'Пожалуйста, введите целое число от 64 до 256!')
 
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):

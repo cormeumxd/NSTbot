@@ -5,6 +5,11 @@ from config import token
 first_photo = False
 second_photo = False
 
+#Hyperparametres
+epochs = 100
+alpha = 10
+betta = 1000
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -13,9 +18,25 @@ bot = Bot(token=token)
 dp = Dispatcher(bot)
 
 
+@dp.message_handler(commands=['epochs'])
+async def set_epochs(message: types.Message):
+    try:
+        epochs = int(message.text.split()[1])
+        if epochs < 50 or epochs > 300:
+            raise ValueError
+        await message.answer(f'Количетво эпох: {epochs}')
+    except (ValueError, IndexError):
+        await message.answer(f'Пожалуйста, введите целое число от 50 до 300!')
+
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
     await message.answer("Привет! Я могу перенести стиль одной фотографии на другую. Для этого отправь мне две фотографии")
+
+
+@dp.message_handler(commands=['start', 'help'])
+async def send_welcome(message: types.Message):
+    await message.answer("Привет! Я могу перенести стиль одной фотографии на другую. Для этого отправь мне две фотографии")
+
 
 
 @dp.message_handler(content_types=types.ContentType.PHOTO)

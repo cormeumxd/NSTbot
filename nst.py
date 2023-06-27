@@ -11,13 +11,14 @@ import numpy as np
 
 
 class NeuralStyleTransform():
-  def __init__(self, content_image, style_image):
+  def __init__(self):
     self.cnn = models.vgg19(pretrained=True).to(device).eval().features[:35].requires_grad_(False)
     self.content_layers = {19}
     self.style_layers = {0, 5, 10, 19, 28, 34}
+
+  def load_images(self, style_image, content_image):
     self.content_image = content_image
     self.style_image = style_image
-
 
   def content_loss(self, input_img, content_img):
     return torch.mean((input_img - content_img)**2)

@@ -1,3 +1,7 @@
+from PIL import Image
+import torch
+import torchvision.transforms as transforms
+
 def image_load_transform(path, IMG_SIZE):
   img = Image.open(path)
   loader = transforms.Compose([

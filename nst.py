@@ -1,3 +1,15 @@
+import torch
+import torchvision.transforms as transforms
+from PIL import Image
+import torch.nn as nn
+import torchvision.models as models
+import torch.optim as optim
+from torchvision.utils import save_image
+import matplotlib.pyplot as plt
+
+import numpy as np
+
+
 class NeuralStyleTransform():
   def __init__(self, content_image, style_image):
     self.cnn = models.vgg19(pretrained=True).to(device).eval().features[:35].requires_grad_(False)
@@ -30,6 +42,7 @@ class NeuralStyleTransform():
         features[num] = x
     return features
 
+  #useless
   def denormalize(self, tensor):
     mean = torch.tensor([0.485, 0.456, 0.406]).to(device)
     std = torch.tensor([0.229, 0.224, 0.225]).to(device)
@@ -42,7 +55,7 @@ class NeuralStyleTransform():
     optimizer = optim.Adam([input_image], lr=learning_rate)
     content_features = self.get_features(self.content_image, self.content_layers)
     style_features = self.get_features(self.style_image, self.style_layers)
-    for epoch in tqdm(range(epochs)):
+    for epoch in range(epochs):
       optimizer.zero_grad()
       content_loss = style_loss = 0
       input_features = self.get_features(input_image, self.content_layers.union(self.style_layers))
@@ -54,7 +67,7 @@ class NeuralStyleTransform():
       total_loss = alpha*content_loss + betta*style_loss
       total_loss.backward()
       optimizer.step()
-      if epoch % 50 == 0:
-        img_show(self.style_image.cpu(), input_image.cpu().detach())
-        plt.show()
+      #if epoch % 50 == 0:
+        #img_show(self.style_image.cpu(), input_image.cpu().detach())
+        #plt.show()
     return input_image.detach().clamp(0, 1)

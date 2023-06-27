@@ -5,6 +5,7 @@ import torch.nn as nn
 import torchvision.models as models
 import torch.optim as optim
 from torchvision.utils import save_image
+from transform import image_load_transform
 
 import numpy as np
 

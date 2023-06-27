@@ -82,14 +82,18 @@ async def handle_media_group(message: types.Message):
                             'Теперь пришлите второе фото '
                             '/cancel для отмены')
         first_photo = True
-        photo_id = message.photo[-1].file_id
-        photo_file = await bot.download_file_by_id(photo_id)
-        style_image = Image.open(io.BytesIO(photo_file.getvalue()))
+        style_id = message.photo[-1].file_id
+        style_file = await bot.download_file_by_id(style_id)
+        style_image = Image.open(io.BytesIO(style_file.getvalue()))
     elif first_photo and not second_photo:
-        #TODO Download photo
+        content_id = message.photo[-1].file_id
+        content_file = await bot.download_file_by_id(content_id)
+        content_image = Image.open(io.BytesIO(content_file.getvalue()))
         await message.answer('Второе фото получено! Думаю...')
         first_photo = False
         second_photo = False
+
+        
 
 @dp.message_handler(commands=['cancel'])
 async def cancel_command(message: types.Message):

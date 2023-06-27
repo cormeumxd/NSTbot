@@ -2,8 +2,6 @@ import logging
 from aiogram import Bot, Dispatcher, types
 from config import token
 from nst import NeuralStyleTransform
-from PIL import Image
-import torch
 
 first_photo = False
 second_photo = False
@@ -16,6 +14,9 @@ IMG_SIZE = 128
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
+
+#model
+model = NeuralStyleTransform()
 
 # Initialize bot and dispatcher
 bot = Bot(token=token)
@@ -84,16 +85,16 @@ async def handle_media_group(message: types.Message):
         first_photo = True
         style_id = message.photo[-1].file_id
         style_file = await bot.download_file_by_id(style_id)
-        style_image = Image.open(io.BytesIO(style_file.getvalue()))
     elif first_photo and not second_photo:
         content_id = message.photo[-1].file_id
         content_file = await bot.download_file_by_id(content_id)
-        content_image = Image.open(io.BytesIO(content_file.getvalue()))
         await message.answer('Второе фото получено! Думаю...')
         first_photo = False
         second_photo = False
 
-        
+        style_image = image_load_transform(io.BytesIO(style_file.getvalue()))
+        content_image = image_load_transform(io.BytesIO(content_file.getvalue()))
+
 
 @dp.message_handler(commands=['cancel'])
 async def cancel_command(message: types.Message):

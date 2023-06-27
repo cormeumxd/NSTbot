@@ -7,12 +7,10 @@ import torch.optim as optim
 from torchvision.utils import save_image
 from transform import image_load_transform
 
-import numpy as np
-
 
 class NeuralStyleTransform():
   def __init__(self):
-    self.cnn = models.vgg19(pretrained=True).to(device).eval().features[:35].requires_grad_(False)
+    self.cnn = models.vgg19(pretrained=True).eval().features[:35].requires_grad_(False)
     self.content_layers = {19}
     self.style_layers = {0, 5, 10, 19, 28, 34}
 
@@ -45,8 +43,8 @@ class NeuralStyleTransform():
 
   #useless
   def denormalize(self, tensor):
-    mean = torch.tensor([0.485, 0.456, 0.406]).to(device)
-    std = torch.tensor([0.229, 0.224, 0.225]).to(device)
+    mean = torch.tensor([0.485, 0.456, 0.406])
+    std = torch.tensor([0.229, 0.224, 0.225])
     tensor = tensor * std[:, None, None] + mean[:, None, None]
     tensor = torch.clamp(tensor, 0, 1)
     return tensor

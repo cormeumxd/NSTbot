@@ -29,6 +29,29 @@ async def set_epochs(message: types.Message):
     except (ValueError, IndexError):
         await message.answer(f'Пожалуйста, введите целое число от 50 до 300!')
 
+
+@dp.message_handler(commands=['alpha'])
+async def set_alpha(message: types.Message):
+    try:
+        if int(message.text.split()[1]) < 1 or int(message.text.split()[1]) > 100000:
+            raise ValueError
+        alpha = int(message.text.split()[1])
+        await message.answer(f'Параметр alpha: {alpha}')
+    except (ValueError, IndexError):
+        await message.answer(f'Пожалуйста, введите целое число от 1 до 100000!')
+
+
+@dp.message_handler(commands=['betta'])
+async def set_betta(message: types.Message):
+    try:
+        if int(message.text.split()[1]) < 1 or int(message.text.split()[1]) > 100000:
+            raise ValueError
+        betta = int(message.text.split()[1])
+        await message.answer(f'Параметр betta: {betta}')
+    except (ValueError, IndexError):
+        await message.answer(f'Пожалуйста, введите целое число от 1 до 100000!')
+
+
 @dp.message_handler(commands=['imgsize'])
 async def set_imgsize(message: types.Message):
     try:
@@ -41,14 +64,11 @@ async def set_imgsize(message: types.Message):
 
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
-    await message.answer("Привет! Я могу перенести стиль одной фотографии на другую. Для этого отправь мне две фотографии")
-
-
-@dp.message_handler(commands=['start', 'help'])
-async def send_welcome(message: types.Message):
-    await message.answer("Привет! Я могу перенести стиль одной фотографии на другую. Для этого отправь мне две фотографии")
-
-
+    await message.answer('Привет! Я могу перенести стиль одной фотографии на другую. Для этого отправь мне две фотографии\n'
+                        '/epochs n - установить количество эпох, равное n\n'
+                        '/imgsize n - установить размер получаемого изображения на nXn\n'
+                        '/alpha n - установить параметр alpha, равный n\n'
+                        '/betta n - установить параметр betta, равный n\n')
 
 @dp.message_handler(content_types=types.ContentType.PHOTO)
 async def handle_media_group(message: types.Message):
@@ -73,7 +93,8 @@ async def cancel_command(message: types.Message):
     if first_photo and not second_photo:
         await message.answer('Отправка отменена')
         first_photo = False
-        #TODO Delete
+    else:
+        await message.answer('Нечего отменять')
 
 
 @dp.message_handler()

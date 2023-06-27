@@ -1,10 +1,14 @@
 import logging
+import io
 from aiogram import Bot, Dispatcher, types
 from config import token
 from nst import NeuralStyleTransform
+from transform import image_load_transform
 
 first_photo = False
 second_photo = False
+
+
 
 #Hyperparametres
 epochs = 100
@@ -78,6 +82,8 @@ async def send_welcome(message: types.Message):
 async def handle_media_group(message: types.Message):
     global first_photo
     global second_photo
+    global style_file
+    global content_file
     if not first_photo and not second_photo:
         await message.answer('Первое фото получено! '
                             'Теперь пришлите второе фото '
@@ -92,8 +98,13 @@ async def handle_media_group(message: types.Message):
         first_photo = False
         second_photo = False
 
-        style_image = image_load_transform(io.BytesIO(style_file.getvalue()))
-        content_image = image_load_transform(io.BytesIO(content_file.getvalue()))
+        style_image = image_load_transform(io.BytesIO(style_file.getvalue()), IMG_SIZE)
+        content_image = image_load_transform(io.BytesIO(content_file.getvalue()), IMG_SIZE)
+
+        model.load_images(style_image, content_image)
+
+        final_image = model.transform(epochs, alpha, betta, learning_rate=3e-2)
+        
 
 
 @dp.message_handler(commands=['cancel'])

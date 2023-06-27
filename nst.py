@@ -5,7 +5,6 @@ import torch.nn as nn
 import torchvision.models as models
 import torch.optim as optim
 from torchvision.utils import save_image
-from transform import image_load_transform
 
 
 class NeuralStyleTransform():
@@ -13,6 +12,8 @@ class NeuralStyleTransform():
     self.cnn = models.vgg19(pretrained=True).eval().features[:35].requires_grad_(False)
     self.content_layers = {19}
     self.style_layers = {0, 5, 10, 19, 28, 34}
+    self.content_image = None
+    self.style_image = None
 
   def load_images(self, style_image, content_image):
     self.content_image = content_image
@@ -54,6 +55,7 @@ class NeuralStyleTransform():
     optimizer = optim.Adam([input_image], lr=learning_rate)
     content_features = self.get_features(self.content_image, self.content_layers)
     style_features = self.get_features(self.style_image, self.style_layers)
+    print(epochs)
     for epoch in range(epochs):
       optimizer.zero_grad()
       content_loss = style_loss = 0
@@ -66,7 +68,6 @@ class NeuralStyleTransform():
       total_loss = alpha*content_loss + betta*style_loss
       total_loss.backward()
       optimizer.step()
-      #if epoch % 50 == 0:
-        #img_show(self.style_image.cpu(), input_image.cpu().detach())
-        #plt.show()
+      if epoch % 10 == 0:
+        print(f'Current epoch: {epoch}')
     return input_image.detach().clamp(0, 1)

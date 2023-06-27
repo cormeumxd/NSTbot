@@ -1,6 +1,9 @@
 import logging
 from aiogram import Bot, Dispatcher, types
 from config import token
+from nst import NeuralStyleTransform
+from PIL import Image
+import torch
 
 first_photo = False
 second_photo = False
@@ -79,7 +82,8 @@ async def handle_media_group(message: types.Message):
                             'Теперь пришлите второе фото '
                             '/cancel для отмены')
         first_photo = True
-        #TODO Download photo
+        photo_id = message.photo[-1].file_id
+        photo_file = await bot.download_file_by_id(photo_id)
     elif first_photo and not second_photo:
         #TODO Download photo
         await message.answer('Второе фото получено! Думаю...')

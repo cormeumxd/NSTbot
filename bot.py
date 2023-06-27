@@ -84,6 +84,7 @@ async def handle_media_group(message: types.Message):
         first_photo = True
         photo_id = message.photo[-1].file_id
         photo_file = await bot.download_file_by_id(photo_id)
+        style_image = Image.open(io.BytesIO(photo_file.getvalue()))
     elif first_photo and not second_photo:
         #TODO Download photo
         await message.answer('Второе фото получено! Думаю...')

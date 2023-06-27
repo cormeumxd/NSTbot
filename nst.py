@@ -5,7 +5,6 @@ import torch.nn as nn
 import torchvision.models as models
 import torch.optim as optim
 from torchvision.utils import save_image
-import matplotlib.pyplot as plt
 
 import numpy as np
 

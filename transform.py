@@ -1,6 +1,7 @@
 from PIL import Image
 import torch
 import torchvision.transforms as transforms
+import io
 
 def image_load_transform(path, IMG_SIZE):
   img = Image.open(path)
@@ -12,3 +13,10 @@ def image_load_transform(path, IMG_SIZE):
   ])
   img = loader(img).unsqueeze(0)
   return img.requires_grad_(False)
+
+def tensor_to_image(tensor):
+  tensor = transforms.ToPILImage()(tensor)
+  image_buffer = io.BytesIO()
+  tensor.save(image_buffer, format='JPEG')
+  image_buffer.seek(0)
+  return image_buffer

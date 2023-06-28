@@ -3,7 +3,7 @@ import io
 from aiogram import Bot, Dispatcher, types
 from config import token
 from nst import NeuralStyleTransform
-from transform import image_load_transform
+from transform import image_load_transform, tensor_to_image
 
 first_photo = False
 second_photo = False
@@ -29,6 +29,7 @@ dp = Dispatcher(bot)
 
 @dp.message_handler(commands=['epochs'])
 async def set_epochs(message: types.Message):
+    global epochs
     try:
         if int(message.text.split()[1]) < 50 or int(message.text.split()[1]) > 300:
             raise ValueError
@@ -40,6 +41,7 @@ async def set_epochs(message: types.Message):
 
 @dp.message_handler(commands=['alpha'])
 async def set_alpha(message: types.Message):
+    global alpha
     try:
         if int(message.text.split()[1]) < 1 or int(message.text.split()[1]) > 100000:
             raise ValueError
@@ -51,6 +53,7 @@ async def set_alpha(message: types.Message):
 
 @dp.message_handler(commands=['betta'])
 async def set_betta(message: types.Message):
+    global betta
     try:
         if int(message.text.split()[1]) < 1 or int(message.text.split()[1]) > 100000:
             raise ValueError
@@ -62,6 +65,7 @@ async def set_betta(message: types.Message):
 
 @dp.message_handler(commands=['imgsize'])
 async def set_imgsize(message: types.Message):
+    global IMG_SIZE
     try:
         if int(message.text.split()[1]) < 64 or int(message.text.split()[1]) > 256:
             raise ValueError
@@ -84,6 +88,11 @@ async def handle_media_group(message: types.Message):
     global second_photo
     global style_file
     global content_file
+    global IMG_SIZE
+    global alpha
+    global betta
+    global epochs
+    print(epochs)
     if not first_photo and not second_photo:
         await message.answer('Первое фото получено! '
                             'Теперь пришлите второе фото '
@@ -102,8 +111,11 @@ async def handle_media_group(message: types.Message):
         content_image = image_load_transform(io.BytesIO(content_file.getvalue()), IMG_SIZE)
 
         model.load_images(style_image, content_image)
-
         final_image = model.transform(epochs, alpha, betta, learning_rate=3e-2)
+
+        img = tensor_to_image(final_image.squeeze())
+
+        await bot.send_photo(chat_id=message.chat.id, photo=img)
         
 
 

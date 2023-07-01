@@ -11,10 +11,7 @@ second_photo = False
 
 
 #Hyperparametres
-epochs = 100
-alpha = 10
-betta = 1000
-IMG_SIZE = 128
+user_hyperparametres = {}
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,53 +26,62 @@ dp = Dispatcher(bot)
 
 @dp.message_handler(commands=['epochs'])
 async def set_epochs(message: types.Message):
-    global epochs
+    global user_hyperparametres
     try:
         if int(message.text.split()[1]) < 50 or int(message.text.split()[1]) > 300:
             raise ValueError
-        epochs = int(message.text.split()[1])
-        await message.answer(f'Количетво эпох: {epochs}')
+        user_hyperparametres[message.from_user.id]['epochs'] = int(message.text.split()[1])
+        await message.answer(f'Количетво эпох: {user_hyperparametres[message.from_user.id]["epochs"]}')
     except (ValueError, IndexError):
         await message.answer(f'Пожалуйста, введите целое число от 50 до 300!')
 
 
 @dp.message_handler(commands=['alpha'])
 async def set_alpha(message: types.Message):
-    global alpha
+    global user_hyperparametres
     try:
         if int(message.text.split()[1]) < 1 or int(message.text.split()[1]) > 100000:
             raise ValueError
-        alpha = int(message.text.split()[1])
-        await message.answer(f'Параметр alpha: {alpha}')
+        user_hyperparametres[message.from_user.id]['alpha'] = int(message.text.split()[1])
+        await message.answer(f'Параметр alpha: { user_hyperparametres[message.from_user.id]["alpha"]}')
     except (ValueError, IndexError):
         await message.answer(f'Пожалуйста, введите целое число от 1 до 100000!')
 
 
 @dp.message_handler(commands=['betta'])
 async def set_betta(message: types.Message):
-    global betta
+    global user_hyperparametres
     try:
         if int(message.text.split()[1]) < 1 or int(message.text.split()[1]) > 100000:
             raise ValueError
-        betta = int(message.text.split()[1])
-        await message.answer(f'Параметр betta: {betta}')
+        user_hyperparametres[message.from_user.id]['betta'] = int(message.text.split()[1])
+        await message.answer(f'Параметр betta: {user_hyperparametres[message.from_user.id]["betta"]}')
     except (ValueError, IndexError):
         await message.answer(f'Пожалуйста, введите целое число от 1 до 100000!')
 
 
 @dp.message_handler(commands=['imgsize'])
 async def set_imgsize(message: types.Message):
-    global IMG_SIZE
+    global user_hyperparametres
     try:
         if int(message.text.split()[1]) < 64 or int(message.text.split()[1]) > 256:
             raise ValueError
-        IMG_SIZE = int(message.text.split()[1])
-        await message.answer(f'Качество картинки: {IMG_SIZE}x{IMG_SIZE} пикселей')
+        user_hyperparametres[message.from_user.id]['imgsize'] = int(message.text.split()[1])
+        await message.answer(f'Качество картинки: {user_hyperparametres[message.from_user.id]["imgsize"]}x{user_hyperparametres[message.from_user.id]["imgsize"]} пикселей')
     except (ValueError, IndexError):
         await message.answer(f'Пожалуйста, введите целое число от 64 до 256!')
 
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
+    global user_hyperparametres
+    user_id = message.from_id.id
+    if user_id not in user_hyperparametres:
+        user_hyperparameters[user_id] = {
+            'epochs': 100,
+            'alpha': 10,
+            'betta': 1000,
+            'imgsize': 128
+        }
     await message.answer('Привет! Я могу перенести стиль одной фотографии на другую. Для этого отправь мне две фотографии\n'
                         '/epochs n - установить количество эпох, равное n\n'
                         '/imgsize n - установить размер получаемого изображения на nXn\n'
@@ -88,11 +94,8 @@ async def handle_media_group(message: types.Message):
     global second_photo
     global style_file
     global content_file
-    global IMG_SIZE
-    global alpha
-    global betta
-    global epochs
-    print(epochs)
+    global user_hyperparametres
+    user_id = message.from_user.id
     if not first_photo and not second_photo:
         await message.answer('Первое фото получено! '
                             'Теперь пришлите второе фото '
@@ -107,11 +110,11 @@ async def handle_media_group(message: types.Message):
         first_photo = False
         second_photo = False
 
-        style_image = image_load_transform(io.BytesIO(style_file.getvalue()), IMG_SIZE)
-        content_image = image_load_transform(io.BytesIO(content_file.getvalue()), IMG_SIZE)
+        style_image = image_load_transform(io.BytesIO(style_file.getvalue()), user_hyperparametres[user_id]['imgsize'])
+        content_image = image_load_transform(io.BytesIO(content_file.getvalue()), user_hyperparametres[user_id]['imgsize'])
 
         model.load_images(style_image, content_image)
-        final_image = model.transform(epochs, alpha, betta, learning_rate=3e-2)
+        final_image = model.transform(user_hyperparametres[user_id]['epochs'], user_hyperparametres[user_id]['alpha'], user_hyperparametres[user_id]['betta'], learning_rate=3e-2)
 
         img = tensor_to_image(final_image.squeeze())
 

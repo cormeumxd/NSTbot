@@ -74,9 +74,9 @@ async def set_imgsize(message: types.Message):
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
     global user_hyperparametres
-    user_id = message.from_id.id
+    user_id = message.from_user.id
     if user_id not in user_hyperparametres:
-        user_hyperparameters[user_id] = {
+        user_hyperparametres[user_id] = {
             'epochs': 100,
             'alpha': 10,
             'betta': 1000,
@@ -120,6 +120,10 @@ async def handle_media_group(message: types.Message):
 
         await bot.send_photo(chat_id=message.chat.id, photo=img)
         
+
+@dp.message_handler(commands=['info'])
+async def info_about(message: types.Message):
+    await message.answer(user_hyperparametres[message.from_user.id])
 
 
 @dp.message_handler(commands=['cancel'])

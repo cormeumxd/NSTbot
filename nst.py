@@ -68,6 +68,6 @@ class NeuralStyleTransform():
       total_loss = alpha*content_loss + betta*style_loss
       total_loss.backward()
       optimizer.step()
-      if epoch % 10 == 0:
-        print(f'Current epoch: {epoch}')
+      #if epoch % 10 == 0:
+        #print(f'Current epoch: {epoch}')
     return input_image.detach().clamp(0, 1)

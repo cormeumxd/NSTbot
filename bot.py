@@ -4,6 +4,8 @@ from aiogram import Bot, Dispatcher, types
 from config import token
 from nst import NeuralStyleTransform
 from transform import image_load_transform, tensor_to_image
+import concurrent.futures
+import asyncio
 
 first_photo = False
 second_photo = False
@@ -114,8 +116,13 @@ async def handle_media_group(message: types.Message):
         content_image = image_load_transform(io.BytesIO(content_file.getvalue()), user_hyperparametres[user_id]['imgsize'])
 
         model.load_images(style_image, content_image)
-        final_image = model.transform(user_hyperparametres[user_id]['epochs'], user_hyperparametres[user_id]['alpha'], user_hyperparametres[user_id]['betta'], learning_rate=3e-2)
-
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            loop = asyncio.get_event_loop()
+            final_image = await loop.run_in_executor(
+                executor, model.transform, user_hyperparametres[user_id]['epochs'],
+                user_hyperparametres[user_id]['alpha'], user_hyperparametres[user_id]['betta'],
+                3e-2
+            )
         img = tensor_to_image(final_image.squeeze())
 
         await bot.send_photo(chat_id=message.chat.id, photo=img)

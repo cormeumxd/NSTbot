@@ -100,7 +100,7 @@ async def handle_media_group(message: types.Message):
     user_id = message.from_user.id
     if not first_photo and not second_photo:
         await message.answer('Первое фото получено! '
-                            'Теперь пришлите второе фото '
+                            'Теперь пришлите второе фото\n'
                             '/cancel для отмены')
         first_photo = True
         style_id = message.photo[-1].file_id

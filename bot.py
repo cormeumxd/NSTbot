@@ -98,6 +98,13 @@ async def handle_media_group(message: types.Message):
     global content_file
     global user_hyperparametres
     user_id = message.from_user.id
+    if user_id not in user_hyperparametres:
+        user_hyperparametres[user_id] = {
+            'epochs': 100,
+            'alpha': 10,
+            'betta': 1000,
+            'imgsize': 128
+        }
     if not first_photo and not second_photo:
         await message.answer('Первое фото получено! '
                             'Теперь пришлите второе фото\n'
